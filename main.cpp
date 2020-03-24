@@ -3,7 +3,7 @@
 #include <string>
 
 #include "ReadFile.h"
-#include "Board.h"
+#include "Game.h"
 
 using namespace std;
 
@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	string fileName = "board1.txt";
 	ReadFile boardFile = ReadFile();
 	const string boardContents = boardFile.readFile(fileName);
-	Board board = Board(boardContents);
+	Game board = Game(boardContents);
 
 
 
