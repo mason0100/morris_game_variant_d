@@ -34,20 +34,44 @@ Game::Node Game::minimaxOpening(string &tempBoard1, string &tempBoard2, int turn
 }
 
 
-//removes piece from board
-//this needs to be corrected suedo code is needs reevaluatings
-vector<int> generateRemove(int position, vector<int> list, string board) {
+//generates the moves for pieces
+vector<string> Game::generateMove(int position, string board) {
+	vector<string> list;
 	for (int i = 0; i < board.size(); i++) {
-		if (board[position] == 'B') {
-			if (!closeMill(position, board)) {
-				string tempBoard = board;
-				tempBoard[position] = 'x';
-				list.push_back(position);
+		int positionI = i;
+		if (board[positionI] == WHITE) {
+			vector<int> tempNeighbors = neighbors(positionI);
+			for (int j = 0; i < board.length; i++) {
+				int positionJ = j;
+				if (board[positionJ == EMPTY]) {
+					//something happend here
+				}
 			}
-			return list;
+
 		}
 	}
-	//need second return statement
+
+	return list;
+}
+
+
+//removes piece from board
+//this needs to be corrected suedo code is needs reevaluatings
+vector<string> Game::generateRemove(int position, string board, vector<string> list) {
+	for (int i = 0; i < board.size(); i++) {
+		if (board[i] == BLACK) {
+			int position = i;
+			if (closeMill(position, board) == false) {
+				string tempBoard = board;
+				tempBoard[i] = EMPTY;
+				list.push_back(tempBoard);
+			}
+		}
+	}
+	//if no black pieces were added(all blaack pieces are in mills) add b to L
+	//might be correct might not be correct take a closer look later
+	//might need to put a copy of emptyBoard in list
+	return list;
 }
 
 
