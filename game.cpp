@@ -34,44 +34,131 @@ Game::Node Game::minimaxOpening(string &tempBoard1, string &tempBoard2, int turn
 }
 
 
+//generate opening moves
+vector<string> Game::generateMoveOpenings(string boardPosition) {
+	vector<string> listOfBoardPositions;
+	listOfBoardPositions = generateAdd(boardPosition);
+	return listOfBoardPositions;
+}
+
+
+//generate mid and end game moves
+vector<string> Game::generateMovesMidgameEndgame(string boardPosition) {
+	vector<string> listOfBoardPositions;
+	int whitePieceCount = 0; 
+
+	for (int position = 0; position < boardPosition.size(); position++) {
+		if (boardPosition[position] == WHITE) {
+			whitePieceCount++;
+		}
+	}
+
+	if (whitePieceCount == 3) {
+		listOfBoardPositions = generateHopping(boardPosition);
+	}
+	else {
+		listOfBoardPositions = generateMove(boardPosition);
+	}
+
+	return listOfBoardPositions;
+}
+
+
+//generate add
+vector<string> Game::generateAdd(string boardPosition) {
+	vector<string> listOfBoardPositions;
+
+	for (int position = 0; position < boardPosition.size(); position++) {
+		if (boardPosition[position] == EMPTY) {
+			string tempBoardPositionB = boardPosition;
+			tempBoardPositionB[position] = WHITE; 
+
+			if (closeMill(position, tempBoardPositionB)) {
+				listOfBoardPositions = generateRemove(tempBoardPositionB, listOfBoardPositions);
+			}
+			else {
+				listOfBoardPositions.push_back(tempBoardPositionB);
+			}
+		}
+	}
+	return listOfBoardPositions;
+}
+
+
+//generate hopping
+vector<string> Game::generateHopping(string boardPosition) {
+	vector<string> listOfBoardPositions; 
+
+	for (int alpha = 0; alpha < boardPosition.size(); alpha++) {
+		if (boardPosition[alpha] == WHITE) {
+			for (int beta = 0; beta < boardPosition.size(); beta++) {
+				if (boardPosition[beta] == EMPTY) {
+					
+					string tempBoardPositionB = boardPosition;
+					tempBoardPositionB[alpha] = EMPTY;
+					tempBoardPositionB[beta] = WHITE;
+
+					if (closeMill(beta, tempBoardPositionB)) {
+						listOfBoardPositions = generateRemove(tempBoardPositionB, listOfBoardPositions);
+					}
+					else {
+						listOfBoardPositions.push_back(tempBoardPositionB);
+					}
+				}
+			}
+		}
+	}
+	return listOfBoardPositions;
+}
+
+
 //generates the moves for pieces
-vector<string> Game::generateMove(int position, string board) {
-	vector<string> list;
-	for (int i = 0; i < board.size(); i++) {
-		int positionI = i;
-		if (board[positionI] == WHITE) {
-			vector<int> tempNeighbors = neighbors(positionI);
-			for (int j = 0; i < board.length; i++) {
-				int positionJ = j;
-				if (board[positionJ == EMPTY]) {
-					//something happend here
+vector<string> Game::generateMove(string boardPosition) {
+
+	vector<string> listOfBoardPositions;
+
+	for (int i = 0; i < boardPosition.size(); i++) {
+		if (boardPosition[i] == WHITE) {
+			vector<int> tempNeighbors = neighbors(i);
+			//for every neighbor
+			for (int j = 0; j < tempNeighbors.size(); j++) {
+				int neighborPosition = tempNeighbors[j];
+				if (boardPosition[neighborPosition] == EMPTY) {
+					
+					string tempBoardPositionB = boardPosition;
+					tempBoardPositionB[i] = EMPTY;
+					tempBoardPositionB[neighborPosition] = WHITE;
+
+					if (closeMill(neighborPosition, tempBoardPositionB)) {
+						listOfBoardPositions = generateRemove(tempBoardPositionB, listOfBoardPositions);
+					}
+					else {
+						listOfBoardPositions.push_back(tempBoardPositionB);
+					}
 				}
 			}
 
 		}
 	}
 
-	return list;
+	return listOfBoardPositions;
 }
 
 
 //removes piece from board
 //this needs to be corrected suedo code is needs reevaluatings
-vector<string> Game::generateRemove(int position, string board, vector<string> list) {
-	for (int i = 0; i < board.size(); i++) {
-		if (board[i] == BLACK) {
-			int position = i;
+vector<string> Game::generateRemove(string board, vector<string> listOfBoardPositions) {
+	for (int position = 0; position < board.size(); position++) {
+		if (board[position] == BLACK) {
 			if (closeMill(position, board) == false) {
 				string tempBoard = board;
-				tempBoard[i] = EMPTY;
-				list.push_back(tempBoard);
+				tempBoard[position] = EMPTY;
+				listOfBoardPositions.push_back(tempBoard);
 			}
 		}
 	}
 	//if no black pieces were added(all blaack pieces are in mills) add b to L
-	//might be correct might not be correct take a closer look later
-	//might need to put a copy of emptyBoard in list
-	return list;
+	return listOfBoardPositions;
 }
 
 
@@ -285,21 +372,53 @@ bool Game::closeMill(int position, string board) {
 }
 
 
+//static estimation
+int Game::staticEstimationFunctionMidEnd(string boardPosition, vector<string> listOfBoardPositions) {
+	int whitePieces = 0;
+	int blackPieces = 0;
+	int numBlackMoves = listOfBoardPositions.size();
+
+	for (int i = 0; i < boardPosition.size(); i++) {
+		if (boardPosition[i] == WHITE) {
+			whitePieces++;
+		}
+	}
+
+	for (int j = 0; j < boardPosition.size(); j++) {
+		if (boardPosition[j] == BLACK) {
+			blackPieces++;
+		}
+	}
+
+	if (blackPieces <= 2) {
+		return 10000;
+	}
+	else if (whitePieces <= 2) {
+		return -10000;
+	}
+	else if (numBlackMoves == 0) {
+		return 10000;
+	}
+	else {
+		return (1000 * (whitePieces - blackPieces) - numBlackMoves);
+	}
+}
+
 //static estimation 
-int Game::staticEstimationFunction(string board) {
+int Game::staticEstimationFunctionOpening(string boardPosition) {
 
 	int whitePieces = 0;
 	int blackPieces = 0;
 	int whiteMinusBlack = 0;
 
-	for (int i = 0; i < board.size(); i++) {
-		if (board[i] == 'W') {
+	for (int i = 0; i < boardPosition.size(); i++) {
+		if (boardPosition[i] == WHITE) {
 			whitePieces++;
 		}
 	}
 
-	for (int j = 0; j < board.size(); j++) {
-		if (board[j] == 'B') {
+	for (int j = 0; j < boardPosition.size(); j++) {
+		if (boardPosition[j] == BLACK) {
 			blackPieces++;
 		}
 	}
