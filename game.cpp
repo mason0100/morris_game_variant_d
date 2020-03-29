@@ -1,44 +1,228 @@
 #include "Game.h"
 
-Game::Game(string tempBoard) {
-	board1 = tempBoard;
-	cout << board1 << endl;
+Game::Game() {
+	globalPositionCount = 0;
+	globalStaticEstimate = 0;
+	globalBoardPosition = "";	
 }
 
-Game::Node Game::minimaxOpening(string &tempBoard1, string &tempBoard2, int turn, int depth) {
 
-	struct Node tempNode;
+//deconstructor
+Game::~Game() {
+	globalPositionCount = 0;
+	globalStaticEstimate = 0;
+	globalBoardPosition = "";	
+}
 
-	board1 = tempBoard1;
-	board2 = tempBoard2;
+int Game::minimaxOpening(string boardPosition, bool whiteTurn, int depth) {
 
-	
-
+	//this will be the variable to be returned
+	int staticEstimate;
 
 	if (depth == 0) {
-		//return the node because the bottom of the tree has been reached
-
+		staticEstimate = staticEstimationFunctionOpening(boardPosition);
+		return staticEstimate;
 	}
 
-	if (turn == 0) {
-		//whites turn
+	if (whiteTurn == true) {
+		vector<string> listOfBoardPositions = generateMoveOpenings(boardPosition);
+		//somtehing happens
+		int min = INT_MIN;
+		bool blackTurn = false;
+
+		for (int boardPosition = 0; boardPosition < listOfBoardPositions.size(); boardPosition++) {
+			string tempBoardPosition = listOfBoardPositions[boardPosition];
+			globalStaticEstimate = staticEstimate;
+			int value = minimaxOpening(tempBoardPosition, blackTurn, depth-1);
+			if (value > min) {
+				min = value;
+				staticEstimate = value;
+
+				//gobal assignments
+				globalPositionCount++;
+				globalBoardPosition = tempBoardPosition;
+				
+			}
+		}
 	}
-	else{//turn == 1
-		//blacks turns
+	else{//whiteTurn == false
+		vector<string> listOfBoardPositions = generateMoveOpeningsBlack(boardPosition);
+		//something happens
+		int max = INT_MAX;
+		bool whiteTurn = true;
+
+		for (int boardPosition = 0; boardPosition < listOfBoardPositions.size(); boardPosition++) {
+			string tempBoardPosition = listOfBoardPositions[boardPosition];
+			globalStaticEstimate = staticEstimate;
+			int value = minimaxOpening(tempBoardPosition, whiteTurn, depth - 1);
+			if (value < max) {
+				max = value;
+				staticEstimate = value;
+
+				//gobal assignments
+				globalPositionCount++;
+				globalBoardPosition = tempBoardPosition;
+				
+			}
+		}
 	}
-
-	//must make a node
-
-	//must print out the results with a function to be created
-
+	return staticEstimate;
 }
 
+
+//minimax game 
+int Game::minimaxGame(string boardPosition, bool whiteTurn, int depth) {
+	//this will be the variable to be returned
+	int staticEstimate;
+
+	if (depth == 0) {
+		staticEstimate = staticEstimationFunctionMidEnd(boardPosition);
+		return staticEstimate;
+	}
+
+	if (whiteTurn == true) {
+		vector<string> listOfBoardPositions = generateMovesMidgameEndgame(boardPosition);
+		//somtehing happens
+		int min = INT_MIN;
+		bool blackTurn = false;
+
+		for (int boardPosition = 0; boardPosition < listOfBoardPositions.size(); boardPosition++) {
+			string tempBoardPosition = listOfBoardPositions[boardPosition];
+			globalStaticEstimate = staticEstimate;
+			int value = minimaxGame(tempBoardPosition, blackTurn, depth - 1);
+			if (value > min) {
+				min = value;
+				staticEstimate = value;
+
+				//gobal assignments
+				globalPositionCount++;
+				globalBoardPosition = tempBoardPosition;
+
+			}
+		}
+	}
+	else {//whiteTurn == false
+		vector<string> listOfBoardPositions = generateMovesMidgameEndgameBlack(boardPosition);
+		//something happens
+		int max = INT_MAX;
+		bool whiteTurn = true;
+
+		for (int boardPosition = 0; boardPosition < listOfBoardPositions.size(); boardPosition++) {
+			string tempBoardPosition = listOfBoardPositions[boardPosition];
+			globalStaticEstimate = staticEstimate;
+			int value = minimaxGame(tempBoardPosition, whiteTurn, depth - 1);
+			if (value < max) {
+				max = value;
+				staticEstimate = value;
+
+				//gobal assignments
+				globalPositionCount++;
+				globalBoardPosition = tempBoardPosition;
+
+			}
+		}
+	}
+	return staticEstimate;
+}
+
+
+//ABOpening
+//must be primed with INT_MAX and INT_MIN
+//alpha = -infinity
+//beta = infinity 
+int Game::ABOpening(string boardPosition, bool whiteTurn, int depth, int alpha, int beta) {
+	//this will be the variable to be returned
+	int staticEstimate;
+	int tempAlpha = alpha;
+	int tempBeta = beta;
+
+	if (depth == 0) {
+		staticEstimate = staticEstimationFunctionOpening(boardPosition);
+		return staticEstimate;
+	}
+	
+	if (whiteTurn == true) {
+		vector<string> listOfBoardPositions = generateMoveOpenings(boardPosition);
+		
+		bool blackTurn = false;
+
+		for (int boardPosition = 0; boardPosition < listOfBoardPositions.size(); boardPosition++) {
+			string tempBoardPosition = listOfBoardPositions[boardPosition];
+			globalStaticEstimate = staticEstimate;
+			int value = ABOpening(tempBoardPosition, blackTurn, depth - 1, tempAlpha, tempBeta);
+			if (value > tempAlpha) {
+				tempAlpha = value;
+				staticEstimate = value;
+
+				//gobal assignments
+				globalPositionCount++;
+				globalBoardPosition = tempBoardPosition;
+
+			}
+			if (tempAlpha >= tempBeta) {
+				break;
+			}
+		}
+	}
+	else {//whiteTurn == false
+		vector<string> listOfBoardPositions = generateMoveOpeningsBlack(boardPosition);
+		
+		bool whiteTurn = true;
+
+		for (int boardPosition = 0; boardPosition < listOfBoardPositions.size(); boardPosition++) {
+			string tempBoardPosition = listOfBoardPositions[boardPosition];
+			globalStaticEstimate = staticEstimate;
+			int value = ABOpening(tempBoardPosition, whiteTurn, depth - 1, tempAlpha, tempBeta);
+			if (value < tempBeta) {
+				tempBeta = value;
+				staticEstimate = value;
+
+				//gobal assignments
+				globalPositionCount++;
+				globalBoardPosition = tempBoardPosition;
+
+			}
+			if (tempAlpha >= tempBeta) {
+				break;
+			}
+		}
+	}
+	if (whiteTurn == true) {
+		staticEstimate = tempAlpha;
+	}
+	else {
+		staticEstimate = tempBeta;
+	}
+	return staticEstimate;
+}
+
+//ABGame
+int Game::ABGame(string boardPosition, bool whiteTurn, int depth, int alpha, int beta) {
+
+}
 
 //generate opening moves
 vector<string> Game::generateMoveOpenings(string boardPosition) {
 	vector<string> listOfBoardPositions;
 	listOfBoardPositions = generateAdd(boardPosition);
 	return listOfBoardPositions;
+}
+
+
+//generate black mover openings
+vector<string> Game::generateMoveOpeningsBlack(string boardPosition) {
+	string tempBoardPosition = boardPosition;
+	//inverts board to evaluate black turn
+	string blackBoardPosition = invertBoard(tempBoardPosition);
+
+	vector<string> listofBoardPosistions = generateAdd(blackBoardPosition);
+
+	//inverts all boardPositions in listOfBoardPositions
+	for (int i = 0; i < listofBoardPosistions.size(); i++) {
+		string tempBlackBoardPosition = listofBoardPosistions[i];
+		listofBoardPosistions[i] = invertBoard(tempBlackBoardPosition);
+	}
+	return listofBoardPosistions;
 }
 
 
@@ -58,6 +242,21 @@ vector<string> Game::generateMovesMidgameEndgame(string boardPosition) {
 	}
 	else {
 		listOfBoardPositions = generateMove(boardPosition);
+	}
+
+	return listOfBoardPositions;
+}
+
+
+//
+vector<string> Game::generateMovesMidgameEndgameBlack(string boardPosition) {
+	vector<string> listOfBoardPositions;
+	string tempBoardPositions = invertBoard(boardPosition);
+	listOfBoardPositions = generateMovesMidgameEndgame(tempBoardPositions);
+	
+	for (int i = 0; i < listOfBoardPositions.size(); i++) {
+		string tempBlackBoardPosition = listOfBoardPositions[i];
+		listOfBoardPositions[i] = invertBoard(tempBlackBoardPosition);
 	}
 
 	return listOfBoardPositions;
@@ -372,6 +571,19 @@ bool Game::closeMill(int position, string board) {
 }
 
 
+//inverts boardPositions to evaluate black 
+string Game::invertBoard(string boardPosition) {
+	string tempBoardPosition = boardPosition;
+	for (int i = 0; i < tempBoardPosition.size(); i++) {
+		if (tempBoardPosition[i] == WHITE)
+			tempBoardPosition[i] = BLACK;
+		else if (tempBoardPosition[i] == BLACK)
+			tempBoardPosition[i] = WHITE;
+	}
+	return tempBoardPosition;
+}
+
+
 //static estimation
 int Game::staticEstimationFunctionMidEnd(string boardPosition, vector<string> listOfBoardPositions) {
 	int whitePieces = 0;
@@ -424,4 +636,12 @@ int Game::staticEstimationFunctionOpening(string boardPosition) {
 	}
 	whiteMinusBlack = whitePieces - blackPieces;
 	return whiteMinusBlack;
+}
+
+
+//Uitilty functions
+void Game::printGlobalVars() {
+	cout << "Board Position: " << globalBoardPosition << endl;
+	cout << "Positions evaluated by static evaluation: " << globalPositionCount << endl;
+	cout << "Minimax Estimate: " << globalStaticEstimate << endl;
 }

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class ReadFile
+class FileManager
 {
 
 public:
@@ -20,9 +20,9 @@ public:
 	const int boardNodeCount = 23;
 	
 	//constructors
-	ReadFile();
+	FileManager();
 
-public://functions 
+	//functions 
 	//returns a string to be used for the boardContents array for the rest of the program 
 	string readFile(string tempFileName);
 	

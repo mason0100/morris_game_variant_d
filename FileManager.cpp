@@ -1,12 +1,12 @@
-#include "ReadFile.h"
+#include "FileManager.h"
 
-ReadFile::ReadFile() {
+FileManager::FileManager() {
 
 }
 
 
 //Reads file and converts the contents of the file to a string
-string ReadFile::readFile(string FileName) {
+string FileManager::readFile(string FileName) {
 
 
 	//creates file object
