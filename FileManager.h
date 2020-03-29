@@ -25,6 +25,7 @@ public:
 	//functions 
 	//returns a string to be used for the boardContents array for the rest of the program 
 	string readFile(string tempFileName);
+	void writeFile(string boardPositions, string fileName);
 	
 
 };

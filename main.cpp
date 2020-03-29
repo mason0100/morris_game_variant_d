@@ -9,6 +9,7 @@ using namespace std;
 
 
 const string ERROR_MESSAGE_1 = "Parameters not entered correctley";
+const string ERROR_MESSSAGE_2 = "Program selection parameter incorrect";
 
 //global class variable
 int Game::globalPositionCount;
@@ -24,25 +25,68 @@ int main(int argc, char* argv[]) {
 	*argv[4] == which program is to be ran, see ReadMe
 	*/
 
-	/*if (argc != 5) {
+	if (argc != 5) {
 		cout << ERROR_MESSAGE_1 << endl;
 		return -1;
-	}*/
+	}
 
-	//string fileName = argv[1];
-	string fileName = "board1.txt";
+	
+	string inputFile = argv[1];
+	string outputFile = argv[2];
+	int depth = stoi(argv[3]);
+	int selector = stoi(argv[4]);
+
 	FileManager boardFile = FileManager();
-	const string boardContents = boardFile.readFile(fileName);
+	const string boardContents = boardFile.readFile(inputFile);
 	Game board = Game();
-	board.minimaxOpening(boardContents, true, 3);
-	board.printGlobalVars();
+	
+	switch (selector) {
+	case 0: 
+		board.minimaxOpening(boardContents, true, 3);
+		board.printGlobalVars(boardContents);
+		boardFile.writeFile(Game::globalBoardPosition, outputFile);
+		break;
+	case 1:
+		board.minimaxGame(boardContents, true, 3);
+		board.printGlobalVars(boardContents);
+		boardFile.writeFile(Game::globalBoardPosition, outputFile);
+		break;
+	case 2:
+		board.ABOpening(boardContents, true, 3,INT_MIN, INT_MAX);
+		board.printGlobalVars(boardContents);
+		boardFile.writeFile(Game::globalBoardPosition, outputFile);
+		break;
+	case 3:
+		board.ABGame(boardContents, true, 3, INT_MIN, INT_MAX);
+		board.printGlobalVars(boardContents);
+		boardFile.writeFile(Game::globalBoardPosition, outputFile);
+		break;
+	case 4:
+		board.minimaxOpeningBlack(boardContents, true, 3);
+		board.printGlobalVars(boardContents);
+		boardFile.writeFile(Game::globalBoardPosition, outputFile);
+		break;
+	case 5:
+		board.minimaxGameBlack(boardContents, true, 3);
+		board.printGlobalVars(boardContents);
+		boardFile.writeFile(Game::globalBoardPosition, outputFile);
+		break;
+	case 6:
+		board.minimaxOpeningImproved(boardContents, true, 3);
+		board.printGlobalVars(boardContents);
+		boardFile.writeFile(Game::globalBoardPosition, outputFile);
+		break;
+	case 7:
+		board.minimaxGameImproved(boardContents, true, 3);
+		board.printGlobalVars(boardContents);
+		boardFile.writeFile(Game::globalBoardPosition, outputFile);
+		break;
+	default:
+		cout << ERROR_MESSSAGE_2 << endl;
 
-	//use switch statement and argv[4] to select program to run
+	
+	}
 
-
-
-
-	//need to write function to write ending result to second board.txt;
 	return 0;
 }
 

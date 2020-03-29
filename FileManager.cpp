@@ -6,14 +6,14 @@ FileManager::FileManager() {
 
 
 //Reads file and converts the contents of the file to a string
-string FileManager::readFile(string FileName) {
+string FileManager::readFile(string fileName) {
 
 
 	//creates file object
 	fstream myFile;
 
 	//opens file
-	myFile.open(FileName);
+	myFile.open(fileName);
 
 	if (myFile.is_open() == false) {
 		cout << ERROR_MESSAGE_2 << endl;
@@ -43,6 +43,24 @@ string FileManager::readFile(string FileName) {
 
 	//this returns the string to be used as  the board array
 	return boardContents;
+}
+
+
+//write boardPosition to file
+void FileManager::writeFile(string boardPosition, string fileName) {
+	//creates file object
+	fstream myFile;
+
+	//opens file
+	myFile.open(fileName);
+
+	if (myFile.is_open() == false) {
+		cout << ERROR_MESSAGE_2 << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	myFile << boardPosition;
+	myFile.close();
 }
 
 

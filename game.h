@@ -10,13 +10,10 @@ class Game
 {
 public:
 
-	
-	//not sure if this wll be used or required to make program work
-	//evaluate at end of node struct will be beneficial
-	struct Node {
-		int miniMaxEstimate;
-		string  boardPosition;//string representing char array for the board
-	};
+	//global position counter
+	static int globalPositionCount;
+	static int globalStaticEstimate;
+	static string globalBoardPosition;
 
 	//When calling this prgram the doconstructor MUST be called
 	//a the end of each class object instance to ensure the 
@@ -31,13 +28,16 @@ public:
 	//functions
 	int minimaxOpening(string boardPosition, bool whiteTurn, int depth);//case 0
 	int minimaxGame(string boardPosition, bool whiteTurn, int depth);//case1 
-	int ABOpening(string boardPosition, bool whiteTurn, int depth, int alpha, int beta);// case 3
-	int ABGame(string boardPosition, bool whiteTurn, int depth, int alpha, int beta);//case 4
-
+	int ABOpening(string boardPosition, bool whiteTurn, int depth, int alpha, int beta);// case 2
+	int ABGame(string boardPosition, bool whiteTurn, int depth, int alpha, int beta);//case 3
+	int minimaxOpeningBlack(string boardPosition, bool whiteTurn, int depth);//case 4
+	int minimaxGameBlack(string boardPosition, bool whiteTurn, int depth);//case 5
+	int minimaxOpeningImproved(string boardPosition, bool whiteTurn, int depth);//case 6
+	int minimaxGameImproved(string boardPosition, bool whiteTurn, int depth);//case 7
 
 
 	//utility functions
-	void printGlobalVars();
+	void printGlobalVars(string boardPosition);
 
 private:
 	//string constanats
@@ -45,10 +45,7 @@ private:
 	const char WHITE = 'W';
 	const char BLACK = 'B';
 
-	//global position counter
-	static int globalPositionCount;
-	static int globalStaticEstimate; 
-	static string globalBoardPosition;
+	
 
 	//helper funtions 
 	vector<string> generateMoveOpenings(string boardPosition);
@@ -66,6 +63,8 @@ private:
 
 	int staticEstimationFunctionMidEnd(string boardPosition, vector<string> listOfBoardPositions);
 	int staticEstimationFunctionOpening(string boardPosition);
+	int staticEstimationFunctionMidEndImproved(string boardPosition, vector<string> listOfBoardPositions);
+	int staticEstimationFunctionOpeningImproved(string boardPosition);
 
 	
 };
